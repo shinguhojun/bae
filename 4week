@@ -1,0 +1,85 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
+
+void main() => runApp(const MyApp());
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: '현재 시각 앱',
+      home: const TimeDisplayPage(),
+    );
+  }
+}
+
+class TimeDisplayPage extends StatefulWidget {
+  const TimeDisplayPage({super.key});
+
+  @override
+  State<TimeDisplayPage> createState() => _TimeDisplayPageState();
+}
+
+class _TimeDisplayPageState extends State<TimeDisplayPage> {
+  late Timer _timer;
+  late DateTime _now;
+
+  @override
+  void initState() {
+    super.initState();
+    _now = DateTime.now();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        _now = DateTime.now();
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  String _formatDate(DateTime dt) {
+    return "${dt.year.toString().padLeft(4, '0')}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}";
+  }
+
+  String _formatTime(DateTime dt) {
+    int hour = dt.hour;
+    String period = '오전';
+    if (hour >= 12) {
+      period = '오후';
+      if (hour > 12) hour -= 12;
+    }
+    if (hour == 0) hour = 12;
+    String minute = dt.minute.toString().padLeft(2, '0');
+    String second = dt.second.toString().padLeft(2, '0');
+    return '$period $hour:$minute:$second';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('현재 시각')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              _formatDate(_now),
+              style: const TextStyle(fontSize: 36),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              _formatTime(_now),
+              style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
